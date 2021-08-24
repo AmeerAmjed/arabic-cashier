@@ -1,6 +1,6 @@
 # <img src="assets/images/shoppingCart.png" width="40" title="shoppingCart"> cashier
 
- Arabic Flutter application ,that used local DB with QR,Bar code scanner purchase management (much, price) to get final Bill .
+ Arabic Flutter application ,that used local DB with QR,Bar code scanner purchase management (much, price) to get final bill .
 
 ## library used
 
