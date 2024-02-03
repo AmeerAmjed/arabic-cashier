@@ -1,7 +1,7 @@
 import 'package:cashier/screens/setting/setting.dart';
 import 'package:flutter/material.dart';
 
-class Appbar extends StatelessWidget with PreferredSizeWidget {
+class Appbar extends StatelessWidget implements PreferredSizeWidget {
   const Appbar({
     Key? key,
   }) : super(key: key);

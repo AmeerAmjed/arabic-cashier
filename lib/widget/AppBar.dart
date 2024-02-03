@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AppbarBack extends StatelessWidget with PreferredSizeWidget {
+class AppbarBack extends StatelessWidget implements PreferredSizeWidget {
   final String nameScreen;
   final bool action;
   final VoidCallback? onPressed;
