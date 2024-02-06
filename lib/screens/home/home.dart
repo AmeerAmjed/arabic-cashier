@@ -3,12 +3,16 @@ import 'package:cashier/screens/home/components/button.dart';
 import 'package:cashier/screens/home/components/image.dart';
 import 'package:cashier/screens/insertdata/insertData.dart';
 import 'package:cashier/screens/scanner/scanner.dart';
+import 'package:cashier/screens/scanner/scanners_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final scannersController = context.watch<ScannersController>();
+
     double buttonWidth = MediaQuery.of(context).size.width * 0.5;
     return Scaffold(
       backgroundColor: Colors.white,
@@ -64,8 +68,10 @@ class HomeScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Scanners(),
-                            ),
+                        builder: (context) => Scanners(
+                          effect: scannersController,
+                        ),
+                      ),
                           );
                         },
                       ),

@@ -1,21 +1,25 @@
 import 'dart:io';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
-import 'package:cashier/database/data.dart';
 import 'package:cashier/database/database.dart';
-import 'package:cashier/model/modelDB.dart';
+import 'package:cashier/screens/scanner/scanner_effect.dart';
+import 'package:cashier/screens/scanner/scanners_controller.dart';
 import 'package:cashier/widget/AppBar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
+
+enum ScannerAction { ADD, DELETE, READ }
 
 class Scanners extends StatefulWidget {
-  final bool scanMoreItems;
+  final ScannerAction action;
+  final ScannerEffect effect;
+
   const Scanners({
     Key? key,
-    this.scanMoreItems = false,
+    this.action = ScannerAction.READ,
+    required this.effect,
   }) : super(key: key);
   @override
   State<StatefulWidget> createState() => _ScannersState();
@@ -23,8 +27,7 @@ class Scanners extends StatefulWidget {
 
 class _ScannersState extends State<Scanners>
     with SingleTickerProviderStateMixin {
-  List<ModelDB> dataLables = [];
-  List<String> lables = [];
+  late ScannerAction action;
 
   QRViewController? qrController;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -37,14 +40,15 @@ class _ScannersState extends State<Scanners>
   bool cameraBack = true;
   bool flash = false;
   bool empty = true;
+  late ScannerEffect effect;
 
   late final bool scanMoreItems;
   final AssetsAudioPlayer _assetsAudioPlayer = AssetsAudioPlayer();
   @override
   void initState() {
     super.initState();
-    scanMoreItems = widget.scanMoreItems;
-
+    action = widget.action;
+    effect = widget.effect;
     animationController =
         AnimationController(vsync: this, duration: Duration(seconds: 5));
     animation = IntTween(begin: 0, end: 200).animate(animationController!)
@@ -62,8 +66,6 @@ class _ScannersState extends State<Scanners>
     animationController?.forward();
   }
 
-  // In order to get hot reload to work we need to pause the camera if the platform
-  // is android, or resume the camera if the platform is iOS.
   @override
   void reassemble() {
     super.reassemble();
@@ -75,7 +77,12 @@ class _ScannersState extends State<Scanners>
 
   @override
   Widget build(BuildContext context) {
-    final dat = context.watch<Data>();
+    final scannersController = context.watch<ScannersController>();
+    var scanArea = (MediaQuery.of(context).size.width < 400 ||
+            MediaQuery.of(context).size.height < 400)
+        ? 150.0
+        : 300.0;
+
     return Scaffold(
       appBar: AppbarBack(
         nameScreen: "قرأءة باركود",
@@ -84,7 +91,17 @@ class _ScannersState extends State<Scanners>
       ),
       body: Stack(
         children: [
-          _buildQrView(context),
+          QRView(
+            key: qrKey,
+            onQRViewCreated: _onQRViewCreated,
+            overlay: QrScannerOverlayShape(
+              borderColor: Colors.red,
+              borderRadius: 10,
+              borderLength: 20,
+              borderWidth: 10,
+              cutOutSize: scanArea,
+            ),
+          ),
           Center(
             child: Container(
               width: sizeScanner,
@@ -107,23 +124,14 @@ class _ScannersState extends State<Scanners>
           ),
         ],
       ),
-      floatingActionButton: dataLables.length != 0
+      floatingActionButton: scannersController.productLabel.isNotEmpty
           ? FloatingActionButton(
               child: Icon(
                 Icons.done,
                 size: 33.0,
               ),
               onPressed: () {
-                if (scanMoreItems) {
-                  List<ModelDB> lastItems = dat.getListItem;
-                  List<ModelDB> newItems = new List.from(lastItems)
-                    ..addAll(dataLables);
-                  dat.setListItem = newItems;
-                } else {
-                  dat.setListItem = dataLables;
-                }
-
-                Navigator.pop(context);
+                // Navigator.pop(context);
               },
             )
           : Container(),
@@ -178,62 +186,16 @@ class _ScannersState extends State<Scanners>
     );
   }
 
-  Widget _buildQrView(BuildContext context) {
-    // var scanArea = (MediaQuery.of(context).size.width < 400 ||
-    //         MediaQuery.of(context).size.height < 400)
-    //     ? 150.0
-    //     : 300.0;
-
-    return QRView(
-      key: qrKey,
-      onQRViewCreated: _onQRViewCreated,
-      overlay: QrScannerOverlayShape(
-          borderColor: Colors.red,
-          borderRadius: 10,
-          borderLength: 20,
-          borderWidth: 10,
-          cutOutSize: sizeScannerCamare),
-    );
-  }
-
   void _onQRViewCreated(QRViewController qrController) {
     setState(() {
       this.qrController = qrController;
     });
 
     qrController.scannedDataStream.listen((scanData) async {
-      try {
-        await DB
-            .query(
-          table: tableName,
-          columns: [columnId, columnTitle, columnLable, columnPrice],
-          where: '$columnLable = ?',
-          whereArgs: [scanData.code],
-        )
-            .then((value) async {
-          ModelDB data = ModelDB.fromMap(value[0]);
-
-          if (lables.isEmpty) {
-            print("isEmpty");
-            lables.add(scanData.code);
-            dataLables.add(data);
-            notfi(Alerts.done);
-            // AssetsAudioPlayer.playAndForget(
-            //     Audio('assets/soundAlerts/done.ogg'));
-          } else {
-            print("NotEmpty");
-            if (!lables.contains(data.lable)) {
-              dataLables.add(data);
-              lables.add(scanData.code);
-              notfi(Alerts.done);
-              // AssetsAudioPlayer.playAndForget(
-              //     Audio('assets/soundAlerts/done.ogg'));
-            }
-          }
-        });
-      } catch (error) {
-        notfi(Alerts.error);
-        // AssetsAudioPlayer.playAndForget(Audio('assets/soundAlerts/done.ogg'));
+      if (scanData.code != null) {
+        if (action == ScannerAction.READ) {
+          effect.addNewProductLabel(scanData.code!);
+        }
       }
     });
   }
