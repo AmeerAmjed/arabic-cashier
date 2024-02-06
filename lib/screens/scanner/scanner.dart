@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:cashier/database/database.dart';
+import 'package:cashier/screens/scanner/components/form_add_product.dart';
 import 'package:cashier/screens/scanner/scanner_effect.dart';
 import 'package:cashier/screens/scanner/scanners_controller.dart';
 import 'package:cashier/widget/AppBar.dart';
@@ -93,7 +94,9 @@ class _ScannersState extends State<Scanners>
         children: [
           QRView(
             key: qrKey,
-            onQRViewCreated: _onQRViewCreated,
+            onQRViewCreated: (qrController) {
+              _onQRViewCreated(qrController, scannersController);
+            },
             overlay: QrScannerOverlayShape(
               borderColor: Colors.red,
               borderRadius: 10,
@@ -186,15 +189,45 @@ class _ScannersState extends State<Scanners>
     );
   }
 
-  void _onQRViewCreated(QRViewController qrController) {
+  _onQRViewCreated(
+      QRViewController qrController, ScannersController scannersController) {
     setState(() {
       this.qrController = qrController;
     });
 
     qrController.scannedDataStream.listen((scanData) async {
       if (scanData.code != null) {
-        if (action == ScannerAction.READ) {
-          effect.addNewProductLabel(scanData.code!);
+        if (action == ScannerAction.READ) {}
+        switch (action) {
+          case ScannerAction.READ:
+            {
+              effect.addNewProductLabel(scanData.code!);
+              break;
+            }
+
+          case ScannerAction.ADD:
+            {
+              setState(() {
+                qrController.pauseCamera();
+                animationController?.stop();
+              });
+
+              formAddProduct(
+                context: context,
+                formKey: scannersController.formKey,
+                titleController: scannersController.title,
+                priceController: scannersController.price,
+                onClickAddProduct: () {},
+                onCloseDialog: () {
+                  qrController.resumeCamera();
+                  animationController?.reset();
+                },
+              );
+              break;
+            }
+          case ScannerAction.DELETE:
+            // TODO: Handle this case.
+            break;
         }
       }
     });

@@ -1,7 +1,6 @@
 import 'package:cashier/screens/home/components/appBar.dart';
 import 'package:cashier/screens/home/components/button.dart';
 import 'package:cashier/screens/home/components/image.dart';
-import 'package:cashier/screens/insertdata/insertData.dart';
 import 'package:cashier/screens/scanner/scanner.dart';
 import 'package:cashier/screens/scanner/scanners_controller.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +39,10 @@ class HomeScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Scan(),
+                              builder: (context) => Scanners(
+                                effect: scannersController,
+                                action: ScannerAction.ADD,
+                              ),
                             ),
                           );
                         },
