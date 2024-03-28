@@ -1,37 +1,33 @@
-const String tableName = 'cashier';
-const String dbName = 'dbcashier.db';
+import 'package:cashier/model/base_model.dart';
 
-const columnId = 'id';
-const columnLable = 'lable';
-const columnTitle = 'title';
-const columnPrice = 'price';
-
-class ModelDB {
+class Product extends BaseModel {
   int? id;
   String? lable;
   String? title;
   int? price;
   int? much;
 
-  ModelDB({
+  Product({
     required this.lable,
     required this.title,
     required this.price,
     required this.much,
-  });
-  ModelDB.add({
+  }) : super(null);
+
+  Product.add({
     this.id,
     required this.lable,
     required this.title,
     required this.price,
-  });
-  ModelDB.scanner({
+  }) : super(id);
+
+  Product.scanner({
     this.id,
     required this.lable,
     required this.title,
     required this.price,
     this.much = 1,
-  });
+  }) : super(id);
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       'lable': lable,
@@ -46,8 +42,8 @@ class ModelDB {
     return map;
   }
 
-  static ModelDB fromMap(Map<String, dynamic> map) {
-    return ModelDB.scanner(
+  static Product fromMap(Map<String, dynamic> map) {
+    return Product.scanner(
       id: map['id'],
       lable: map['lable'],
       title: map['title'],

@@ -1,8 +1,8 @@
-import 'package:cashier/model/modelDB.dart';
+import 'package:cashier/model/Product.dart';
 import 'package:flutter/foundation.dart';
 
 class Data with ChangeNotifier {
-  List<ModelDB>? listItem;
+  List<Product>? listItem;
 
   get getListItem => this.listItem;
 
