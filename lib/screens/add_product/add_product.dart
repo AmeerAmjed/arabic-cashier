@@ -1,6 +1,7 @@
 import 'package:cashier/screens/add_product/add_product_controller.dart';
 import 'package:cashier/screens/add_product/components/input.dart';
 import 'package:cashier/widget/AppBar.dart';
+import 'package:cashier/widget/show_snackBar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,11 @@ class AddProduct extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<AddProductController>(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.setLabel(label);
+    });
+
     return Scaffold(
       appBar: AppbarBack(
         title: RichText(
@@ -47,13 +53,7 @@ class AddProduct extends StatelessWidget {
               children: [
                 Input(
                   labelText: 'أسم العنصر',
-                  validator: (value) {
-                    print("object");
-                    if (value == null || value.isEmpty) {
-                      return "الأسم  فارغ مطلوب*";
-                    }
-                    return null;
-                  },
+                  validator: controller.validate,
                   onChanged: (value) {},
                   controller: controller.title,
                   textInputAction: TextInputAction.next,
@@ -61,12 +61,7 @@ class AddProduct extends StatelessWidget {
                 ),
                 Input(
                   labelText: 'السعر',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "السعر فارغ مطلوب *";
-                    }
-                    return null;
-                  },
+                  validator: controller.validate,
                   onChanged: (value) {},
                   controller: controller.price,
                   textInputAction: TextInputAction.done,
@@ -74,12 +69,7 @@ class AddProduct extends StatelessWidget {
                 ),
                 Input(
                   labelText: 'الكمية',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "الكمية فارغ مطلوب *";
-                    }
-                    return null;
-                  },
+                  validator: controller.validate,
                   onChanged: (value) {},
                   controller: controller.much,
                   textInputAction: TextInputAction.done,
@@ -95,7 +85,15 @@ class AddProduct extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      controller.saveProduct().then((state) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          showSnackBar(state.getTitle(), onPressed: () {
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          }),
+                        );
+                      });
+                    },
                     height: 60.0,
                     minWidth: double.infinity,
                     child: Text(
