@@ -1,17 +1,15 @@
 import 'dart:io';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
-import 'package:cashier/database/database.dart';
-import 'package:cashier/screens/scanner/components/form_add_product.dart';
+import 'package:cashier/database/database_manager.dart';
 import 'package:cashier/screens/scanner/scanner_effect.dart';
+import 'package:cashier/screens/scanner/scanner_interaction.dart';
 import 'package:cashier/screens/scanner/scanners_controller.dart';
 import 'package:cashier/widget/AppBar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-
-enum ScannerAction { ADD, DELETE, READ }
 
 class Scanners extends StatefulWidget {
   final ScannerAction action;
@@ -86,7 +84,7 @@ class _ScannersState extends State<Scanners>
 
     return Scaffold(
       appBar: AppbarBack(
-        nameScreen: "قرأءة باركود",
+        nameScreen: action.getTitle(),
         action: true,
         onPressed: () => newMethod(context),
       ),
@@ -134,7 +132,7 @@ class _ScannersState extends State<Scanners>
                 size: 33.0,
               ),
               onPressed: () {
-                // Navigator.pop(context);
+                Navigator.pop(context);
               },
             )
           : Container(),
@@ -212,17 +210,6 @@ class _ScannersState extends State<Scanners>
                 animationController?.stop();
               });
 
-              formAddProduct(
-                context: context,
-                formKey: scannersController.formKey,
-                titleController: scannersController.title,
-                priceController: scannersController.price,
-                onClickAddProduct: () {},
-                onCloseDialog: () {
-                  qrController.resumeCamera();
-                  animationController?.reset();
-                },
-              );
               break;
             }
           case ScannerAction.DELETE:

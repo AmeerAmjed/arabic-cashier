@@ -2,6 +2,7 @@ import 'package:cashier/screens/home/components/appBar.dart';
 import 'package:cashier/screens/home/components/button.dart';
 import 'package:cashier/screens/home/components/image.dart';
 import 'package:cashier/screens/scanner/scanner.dart';
+import 'package:cashier/screens/scanner/scanner_interaction.dart';
 import 'package:cashier/screens/scanner/scanners_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
