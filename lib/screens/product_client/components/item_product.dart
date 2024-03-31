@@ -1,17 +1,12 @@
+import 'package:cashier/model/Product.dart';
 import 'package:flutter/material.dart';
 
-class ListTiles extends StatelessWidget {
-  final String? title;
-  final String? lable;
-  final int? price;
-  final int? much;
+class ItemProduct extends StatelessWidget {
+  final Product product;
 
-  const ListTiles({
+  const ItemProduct({
     Key? key,
-    required this.title,
-    required this.lable,
-    required this.price,
-    required this.much,
+    required this.product,
   }) : super(key: key);
 
   @override
@@ -20,7 +15,7 @@ class ListTiles extends StatelessWidget {
       leading: Padding(
         padding: const EdgeInsets.only(top: 10.0),
         child: Text(
-          '${much!}X',
+          '${product.much!}X',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
@@ -29,7 +24,7 @@ class ListTiles extends StatelessWidget {
         ),
       ),
       title: Text(
-        title!,
+        product.title!,
         style: TextStyle(
           color: Colors.black,
           fontWeight: FontWeight.bold,
@@ -37,16 +32,16 @@ class ListTiles extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        lable!,
+        product.lable!,
         style: TextStyle(
           color: Colors.grey,
           fontWeight: FontWeight.bold,
           fontSize: 12.0,
         ),
       ),
-      trailing: much! == 1
+      trailing: product.much! == 1
           ? Text(
-              '  ${price!} د.ع',
+              '  ${product.price!} د.ع',
               style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
@@ -57,7 +52,7 @@ class ListTiles extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  '  ${(price! * much!)} د.ع',
+                  '  ${(product.price! * product.much!)} د.ع',
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -65,7 +60,7 @@ class ListTiles extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '  ${price!} د.ع',
+                  '  ${product.price!} د.ع',
                   style: TextStyle(
                     color: Colors.black26,
                     fontWeight: FontWeight.bold,
